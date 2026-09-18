@@ -1,0 +1,50 @@
+name: Compilar Nambara FB Media SAFE
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  compilar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Obter o repositório
+        uses: actions/checkout@v4
+
+      - name: Extrair o projecto
+        run: |
+          mkdir projeto
+          unzip -q Nambara-Facebook-573-Media-SAFE-source-v1.zip -d projeto
+          chmod +x projeto/gradlew
+
+      - name: Preparar Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: gradle
+          cache-dependency-path: projeto/**/*.gradle*
+
+      - name: Compilar o MPP
+        working-directory: projeto
+        run: ./gradlew :patches:buildAndroid --no-daemon
+
+      - name: Guardar o MPP
+        uses: actions/upload-artifact@v4
+        with:
+          name: Nambara-Facebook-573-Media-SAFE
+          path: projeto/patches/build/libs/patches-*.mpp
+          if-no-files-found: error
+
+      - name: Publicar em Releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: nambara-safe-v1.${{ github.run_number }}
+        run: |
+          MPP_FILE=$(find projeto/patches/build/libs -maxdepth 1 -name "patches-*.mpp" -print -quit)
+          gh release create "$TAG_NAME" "$MPP_FILE#Nambara-Facebook-573-Media-SAFE.mpp" \
+            --title "Nambara FB Media SAFE v1.${{ github.run_number }}" \
+            --notes "Versão experimental para Facebook 573. Não aplicar juntamente com o patch Download Facebook Media (573)."
