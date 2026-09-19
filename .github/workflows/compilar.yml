@@ -17,7 +17,7 @@ jobs:
       - name: Extrair o projecto
         run: |
           mkdir projeto
-          unzip -q Nambara-Facebook-573-Media-SAFE-source-v1.zip -d projeto
+          unzip -q Nambara-Facebook-573-YTDLnis-source-v2.zip -d projeto
           chmod +x projeto/gradlew
 
       - name: Preparar Java 21
