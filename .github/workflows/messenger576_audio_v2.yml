@@ -1,0 +1,63 @@
+name: Compilar Messenger 576 - Download áudio v2
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - messenger-576-audio-download
+    paths:
+      - ".github/workflows/messenger576_audio_v2.yml"
+      - "messenger576-audio-v2/**"
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  compilar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Obter ficheiros Nambara
+        uses: actions/checkout@v4
+        with:
+          path: nambara
+
+      - name: Obter base Morphe
+        uses: actions/checkout@v4
+        with:
+          repository: rushiranpise/morphe-patches
+          ref: 55ca6a05ea3559e95a0876316dcb7caad1f3c9cf
+          path: morphe-base
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Configurar Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Instalar patch Messenger 576 v2
+        shell: bash
+        run: |
+          set -euxo pipefail
+          mkdir -p morphe-base/patches/src/main/kotlin/app/template/patches/messenger/audio
+          cp nambara/messenger576-audio-v2/Fingerprints.kt              morphe-base/patches/src/main/kotlin/app/template/patches/messenger/audio/Fingerprints.kt
+          cp nambara/messenger576-audio-v2/DownloadAudioPatch.kt              morphe-base/patches/src/main/kotlin/app/template/patches/messenger/audio/DownloadAudioPatch.kt
+          cp nambara/messenger576-audio-v2/MessengerAudioDownloadHelper.java              morphe-base/extensions/extension/src/main/java/app/template/extension/extension/MessengerAudioDownloadHelper.java
+          chmod +x morphe-base/gradlew
+
+      - name: Compilar MPP
+        working-directory: morphe-base
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./gradlew :patches:buildAndroid --no-daemon
+
+      - name: Guardar MPP
+        uses: actions/upload-artifact@v4
+        with:
+          name: messenger-576-download-audio-v2-mpp
+          path: morphe-base/patches/build/libs/*.mpp
+          if-no-files-found: error
