@@ -1,0 +1,42 @@
+name: Compilar Messenger 576 - Download áudio V3
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "messenger576-v3/**"
+      - ".github/workflows/messenger576_audio_v3.yml"
+permissions:
+  contents: read
+  packages: read
+jobs:
+  compilar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: nambara
+      - uses: actions/checkout@v4
+        with:
+          repository: rushiranpise/morphe-patches
+          ref: 55ca6a05ea3559e95a0876316dcb7caad1f3c9cf
+          path: morphe-base
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Instalar código V3
+        run: |
+          cp -R nambara/messenger576-v3/patches/. morphe-base/patches/
+          cp -R nambara/messenger576-v3/extensions/. morphe-base/extensions/
+          chmod +x morphe-base/gradlew
+      - name: Compilar MPP
+        working-directory: morphe-base
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./gradlew :patches:buildAndroid --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: messenger-576-download-audio-v3-mpp
+          path: morphe-base/patches/build/libs/*.mpp
+          if-no-files-found: error
