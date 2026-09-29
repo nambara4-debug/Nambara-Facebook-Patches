@@ -18,7 +18,7 @@ private const val HELPER =
 private const val AUDIO_DOWNLOADER_PROVIDER_ID = 0x28050
 
 /**
- * V3: repurposes the existing Forward menu item ONLY for audio messages.
+ * V3.1: repurposes the existing Forward menu item ONLY for audio messages.
  *
  * Why: in Messenger 576 the Save Video plugin is not admitted into the menu for
  * AudioAttachmentData before its own eligibility callback is consulted, so V1 never
@@ -33,7 +33,7 @@ private const val AUDIO_DOWNLOADER_PROVIDER_ID = 0x28050
  */
 @Suppress("unused")
 val messengerDownloadAudioPatch = bytecodePatch(
-    name = "Download audio messages V3 (576 arm64)",
+    name = "Download audio messages V3.1 (576 arm64)",
     description = "For voice messages, replaces Forward with 'Descarregar áudio' and saves the audio to Downloads.",
 ) {
     compatibleWith(MESSENGER_COMPATIBILITY)
@@ -108,7 +108,7 @@ val messengerDownloadAudioPatch = bytecodePatch(
                 invoke-direct {v4, v3, v1}, LX/Ahr;-><init>(ZLandroid/net/Uri;)V
 
                 iget-object v5, p0, $pluginClassType->${sessionField.name}:$FB_USER_SESSION
-                invoke-virtual {v2, v5, v4}, LX/Q51;->A01($FB_USER_SESSION;LX/Ahr;)LX/1FU;
+                invoke-virtual {v2, v5, v4}, LX/Q51;->A01(${FB_USER_SESSION}LX/Ahr;)LX/1FU;
                 move-result-object v2
 
                 invoke-static {p1, v2}, $HELPER->saveFuture(Landroid/content/Context;Ljava/lang/Object;)V
