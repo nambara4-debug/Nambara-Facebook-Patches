@@ -1,4 +1,4 @@
-name: Compilar Messenger 576 - Download áudio
+name: Compilar Messenger 576 - Download áudio v2
 
 on:
   workflow_dispatch:
@@ -6,6 +6,7 @@ on:
     paths:
       - ".github/workflows/messenger576_audio.yml"
       - "Messenger_576_Morphe_Download_Audio_patch_source.zip"
+      - "messenger-audio-v2/DownloadAudioPatch.kt"
 
 permissions:
   contents: read
@@ -37,11 +38,12 @@ jobs:
       - name: Configurar Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Instalar patch Messenger 576
+      - name: Instalar patch Messenger 576 v2
         shell: bash
         run: |
           set -euxo pipefail
           unzip -qo nambara/Messenger_576_Morphe_Download_Audio_patch_source.zip -d morphe-base
+          cp nambara/messenger-audio-v2/DownloadAudioPatch.kt             morphe-base/patches/src/main/kotlin/app/template/patches/messenger/audio/DownloadAudioPatch.kt
           chmod +x morphe-base/gradlew
 
       - name: Compilar MPP
@@ -53,6 +55,6 @@ jobs:
       - name: Guardar MPP
         uses: actions/upload-artifact@v4
         with:
-          name: messenger-576-download-audio-mpp
+          name: messenger-576-download-audio-v2-mpp
           path: morphe-base/patches/build/libs/*.mpp
           if-no-files-found: error
