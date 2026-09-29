@@ -19,8 +19,8 @@ private const val AUDIO_DOWNLOADER_PROVIDER_ID = 0x28050
 
 @Suppress("unused")
 val messengerDownloadAudioPatch = bytecodePatch(
-    name = "Download audio messages",
-    description = "Adds a 'Descarregar áudio' action to audio messages and saves them to Downloads.",
+    name = "Download audio messages v2",
+    description = "v2: Adds a 'Descarregar áudio' action to voice messages and saves them to Downloads.",
 ) {
     compatibleWith(MESSENGER_COMPATIBILITY)
     dependsOn(messengerSignaturePatch)
