@@ -1,0 +1,21 @@
+package app.morphe.patches.sleepmonitor.ads
+
+import app.morphe.patcher.Fingerprint
+
+/**
+ * Monitor de sono 1.26.0 (sleeptrakcer.sleeprecorder.sleepapp.sleep)
+ *
+ * ad/e.d(Activity): Z  -> decide se o anfitrião de banners (ad/d) pode carregar e mostrar um anúncio.
+ * Devolve false para utilizadores premium; é chamado em 3 pontos de ad/d (campo `m`, ocultação do contentor
+ * e antes de construir o ADRequestList). Devolver false equivale ao caminho de um utilizador premium,
+ * sem tocar na flag de subscrição (iap/K.a).
+ *
+ * Nota: os nomes de classe e de método são ofuscados e válidos apenas para a versão 1.26.0.
+ */
+object BannerAdEligibilityFingerprint : Fingerprint(
+    definingClass = "Lsleeptrakcer/sleeprecorder/sleepapp/sleep/ad/e;",
+    name = "d",
+    returnType = "Z",
+    parameters = listOf("Landroid/app/Activity;"),
+
+)
