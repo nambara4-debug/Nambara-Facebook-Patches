@@ -1,0 +1,24 @@
+package app.morphe.patches.sleepmonitor.ads
+
+import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
+import app.morphe.patcher.patch.bytecodePatch
+
+@Suppress("unused")
+val hideAdsPatch = bytecodePatch(
+    name = "Hide ads",
+    description = "Desativa o anfitrião de anúncios de banner do Monitor de sono.",
+    default = true,
+) {
+    compatibleWith("sleeptrakcer.sleeprecorder.sleepapp.sleep"("1.26.0"))
+
+    execute {
+        // ad/e.d(Activity): Z  ->  return false  (nenhum anúncio é carregado nem mostrado)
+        BannerAdEligibilityFingerprint.method.addInstructions(
+            0,
+            """
+                const/4 v0, 0x0
+                return v0
+            """,
+        )
+    }
+}
